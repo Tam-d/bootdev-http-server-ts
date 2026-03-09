@@ -15,9 +15,9 @@ app.listen(PORT, () => {
   console.log(`Server is running at http://localhost:${PORT}`);
 });
 
-app.get("/healthz", handlerReadiness);
-app.get("/metrics", handlerRequestCount);
-app.get("/reset", handlerResetRequestCount)
+app.get("/api/healthz", handlerReadiness);
+app.get("/api/metrics", handlerRequestCount);
+app.get("/api/reset", handlerResetRequestCount)
 
 async function handlerReadiness(req: Request, res: Response) : Promise<void> {
     res.set("Content-Type", "text/plain; charset=utf-8");

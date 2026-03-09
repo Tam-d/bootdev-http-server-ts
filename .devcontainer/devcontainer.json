@@ -1,0 +1,8 @@
+{
+    "name": "bootdev-http-server-ts",
+    
+    "build": {
+        "dockerfile": "./Dockerfile"
+    }
+
+}

@@ -9,15 +9,20 @@ app.listen(PORT, () => {
     console.log(`Server is running at http://localhost:${PORT}`);
 });
 app.get("/api/healthz", handlerReadiness);
-app.get("/api/metrics", handlerRequestCount);
-app.get("/api/reset", handlerResetRequestCount);
+app.get("/admin/metrics", handlerRequestCount);
+app.get("/admin/reset", handlerResetRequestCount);
 async function handlerReadiness(req, res) {
     res.set("Content-Type", "text/plain; charset=utf-8");
     res.send("OK");
 }
 async function handlerRequestCount(req, res) {
-    res.set("Content-Type", "text/plain; charset=utf-8");
-    res.send(`Hits: ${chirpyStateData.fileserverHits}`);
+    res.set("Content-Type", "text/html; charset=utf-8");
+    res.send(`<html>
+        <body>
+            <h1>Welcome, Chirpy Admin</h1>
+            <p>Chirpy has been visited ${chirpyStateData.fileserverHits} times!</p>
+        </body>
+        </html>`);
 }
 async function handlerResetRequestCount(req, res) {
     chirpyStateData.fileserverHits = 0;

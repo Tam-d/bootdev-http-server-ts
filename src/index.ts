@@ -16,8 +16,8 @@ app.listen(PORT, () => {
 });
 
 app.get("/api/healthz", handlerReadiness);
-app.get("/api/metrics", handlerRequestCount);
-app.get("/api/reset", handlerResetRequestCount)
+app.get("/admin/metrics", handlerRequestCount);
+app.get("/admin/reset", handlerResetRequestCount)
 
 async function handlerReadiness(req: Request, res: Response) : Promise<void> {
     res.set("Content-Type", "text/plain; charset=utf-8");

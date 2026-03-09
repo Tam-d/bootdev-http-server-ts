@@ -10,7 +10,7 @@ app.listen(PORT, () => {
 });
 app.get("/api/healthz", handlerReadiness);
 app.get("/admin/metrics", handlerRequestCount);
-app.get("/admin/reset", handlerResetRequestCount);
+app.post("/admin/reset", handlerResetRequestCount);
 async function handlerReadiness(req, res) {
     res.set("Content-Type", "text/plain; charset=utf-8");
     res.send("OK");

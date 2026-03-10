@@ -19,6 +19,10 @@ apt install -y git
 
 RUN apt install -y curl
 
+RUN apt update && apt install -y postgresql postgresql-contrib
+
+ENV PATH=$PATH:/usr/lib/postgresql/16/bin/
+
 #install go
 RUN curl -OL ${GO_URL} && \
     rm -rf /usr/local/go && \

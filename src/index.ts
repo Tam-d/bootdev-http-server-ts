@@ -1,7 +1,12 @@
 import express from "express";
 import { Request, Response } from "express";
 import { NextFunction } from "express";
+
+import { middlewareLogResponses } from "./middleware.js";
+import { middlewareMetricsInc } from "./middleware.js";
+
 import { chirpyStateData } from "./config.js";
+
 import { validateChirp } from "./handle_chirps.js";
 
 const app = express();
@@ -27,8 +32,6 @@ async function handlerReadiness(req: Request, res: Response) : Promise<void> {
     res.send("OK");
 }
 
-
-
 async function handlerRequestCount(req: Request, res: Response) : Promise<void> {
     res.set("Content-Type", "text/html; charset=utf-8");
     res.send(
@@ -47,18 +50,3 @@ async function handlerResetRequestCount(req: Request, res: Response) : Promise<v
     res.send("OK");
 }
 
-function middlewareLogResponses(req: Request, res: Response, next: NextFunction) : void {
-    res.on("finish", () => {
-        if(res.statusCode !== 200) {
-            console.log(`[NON-OK] ${req.method} ${req.url} - Status: ${res.statusCode}}`);
-        } 
-    });
-
-    next();
-}
-
-function middlewareMetricsInc(req: Request, res: Response, next: NextFunction) {
-  chirpyStateData.fileserverHits++;
-
-  next();
-}

@@ -1,4 +1,6 @@
 import express from "express";
+import { middlewareLogResponses } from "./middleware.js";
+import { middlewareMetricsInc } from "./middleware.js";
 import { chirpyStateData } from "./config.js";
 import { validateChirp } from "./handle_chirps.js";
 const app = express();
@@ -31,16 +33,4 @@ async function handlerResetRequestCount(req, res) {
     chirpyStateData.fileserverHits = 0;
     res.set("Content-Type", "text/plain; charset=utf-8");
     res.send("OK");
-}
-function middlewareLogResponses(req, res, next) {
-    res.on("finish", () => {
-        if (res.statusCode !== 200) {
-            console.log(`[NON-OK] ${req.method} ${req.url} - Status: ${res.statusCode}}`);
-        }
-    });
-    next();
-}
-function middlewareMetricsInc(req, res, next) {
-    chirpyStateData.fileserverHits++;
-    next();
 }

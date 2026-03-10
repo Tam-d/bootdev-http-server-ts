@@ -6,10 +6,11 @@ import { chirpyStateData } from "./config.js";
 const app = express();
 const PORT = 8080;
 
-
+app.use(express.json());
 app.use("/app", middlewareMetricsInc);
 app.use("/app", express.static("./src/app"));
 app.use(middlewareLogResponses);
+
 
 app.listen(PORT, () => {
   console.log(`Server is running at http://localhost:${PORT}`);
@@ -27,21 +28,14 @@ async function handlerReadiness(req: Request, res: Response) : Promise<void> {
 }
 
 async function handlerValidateChirp(req: Request, res: Response) : Promise<void> {
-    let body = "";
+    let body = req.body;
 
-    req.on("data", (data) => {
-        body += data;
-    });
-
-    req.on("end", () => {
-        try {
-            const parsedBody = JSON.parse(body);
-
-            if(!(parsedBody.body.length <= 140)) {
-                throw Error("Chirp is too long")
-            }
-            res.set("Content-Type", "application/json");
-            res.send(JSON.stringify({"valid": true}));
+    try {
+        if(!(body.body.length <= 140)) {
+            throw Error("Chirp is too long");
+        }
+        res.set("Content-Type", "application/json");
+        res.send(JSON.stringify({"valid": true}));
             
         } catch (error) {
             res.set("Content-Type", "application/json");
@@ -49,7 +43,6 @@ async function handlerValidateChirp(req: Request, res: Response) : Promise<void>
                 JSON.stringify({"error": (error as Error).message})
             );
         }
-    });
 }
 
 async function handlerRequestCount(req: Request, res: Response) : Promise<void> {

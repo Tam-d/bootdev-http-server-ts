@@ -2,7 +2,7 @@ import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 
 import * as schema from "./schema.js";
-import { chirpyStateData } from "../config.js";
+import { chirpyConfig } from "../config.js";
 
-const conn = postgres(chirpyStateData.dbURL);
+const conn = postgres(chirpyConfig.dbConfig.dbUrl);
 export const db = drizzle(conn, { schema });

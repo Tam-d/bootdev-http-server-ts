@@ -1,9 +1,4 @@
 import { Error400 } from "./error.js";
-let forbiddenWords = [
-    "kerfuffle",
-    "sharbert",
-    "fornax"
-];
 export async function validateChirp(req, res, next) {
     let body = req.body;
     try {

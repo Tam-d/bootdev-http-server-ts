@@ -1,12 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { Error400 } from "./error.js";
 
-let forbiddenWords = [
-    "kerfuffle",
-    "sharbert",
-    "fornax"
-];
-
 export async function validateChirp(req: Request, res: Response, next: NextFunction) : Promise<void> {
     let body = req.body;
 

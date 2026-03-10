@@ -1,5 +1,5 @@
 import type { Request, Response, NextFunction } from "express";
-import { chirpyStateData } from "./config.js";
+import { chirpyConfig } from "./config.js";
 import { Error400 } from "./error.js";
 
 export function middlewareLogResponses(req: Request, res: Response, next: NextFunction) : void {
@@ -13,7 +13,7 @@ export function middlewareLogResponses(req: Request, res: Response, next: NextFu
 }
 
 export function middlewareMetricsInc(req: Request, res: Response, next: NextFunction) {
-  chirpyStateData.fileserverHits++;
+  chirpyConfig.apiConfig.fileserverHits++;
 
   next();
 }

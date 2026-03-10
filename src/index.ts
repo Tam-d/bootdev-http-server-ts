@@ -5,7 +5,7 @@ import { middlewareLogResponses } from "./middleware.js";
 import { middlewareMetricsInc } from "./middleware.js";
 import { middlewareErrorHandler } from "./middleware.js";
 
-import { chirpyStateData } from "./config.js";
+import { chirpyConfig } from "./config.js";
 
 import { validateChirp } from "./handle_chirps.js";
 
@@ -40,14 +40,14 @@ async function handlerRequestCount(req: Request, res: Response) : Promise<void> 
         `<html>
         <body>
             <h1>Welcome, Chirpy Admin</h1>
-            <p>Chirpy has been visited ${chirpyStateData.fileserverHits} times!</p>
+            <p>Chirpy has been visited ${chirpyConfig.apiConfig.fileserverHits} times!</p>
         </body>
         </html>`
     );
 }
 
 async function handlerResetRequestCount(req: Request, res: Response) : Promise<void> {
-    chirpyStateData.fileserverHits = 0;
+    chirpyConfig.apiConfig.fileserverHits = 0;
     res.set("Content-Type", "text/plain; charset=utf-8");
     res.send("OK");
 }

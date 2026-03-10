@@ -1,5 +1,11 @@
 import { Request, Response } from "express";
 
+let forbiddenWords = [
+    "kerfuffle",
+    "sharbert",
+    "fornax"
+];
+
 export async function validateChirp(req: Request, res: Response) : Promise<void> {
     let body = req.body;
 
@@ -8,7 +14,7 @@ export async function validateChirp(req: Request, res: Response) : Promise<void>
             throw Error("Chirp is too long");
         }
         res.set("Content-Type", "application/json");
-        res.send(JSON.stringify({"valid": true}));   
+        res.send(JSON.stringify({"cleanedBody": sanitizeChirp(body.body)}));   
     }
     catch (error) {
         res.set("Content-Type", "application/json");
@@ -16,4 +22,16 @@ export async function validateChirp(req: Request, res: Response) : Promise<void>
             JSON.stringify({"error": (error as Error).message})
         );
     }
+}
+
+function sanitizeChirp(chirp: string) {
+    console.log(`The original chirp: ${chirp}`);
+    
+    let sanitizedChirp = chirp.replace(
+        /\b(kerfuffle|sharbert|fornax)\b/gi, 
+        "****"
+    );
+
+    console.log(`The sanitized chirp: ${sanitizedChirp}`);
+    return sanitizedChirp;
 }

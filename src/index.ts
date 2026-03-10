@@ -1,6 +1,5 @@
 import express from "express";
 import { Request, Response } from "express";
-import { NextFunction } from "express";
 
 import { middlewareLogResponses } from "./middleware.js";
 import { middlewareMetricsInc } from "./middleware.js";

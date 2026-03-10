@@ -1,6 +1,7 @@
 import express from "express";
 import { middlewareLogResponses } from "./middleware.js";
 import { middlewareMetricsInc } from "./middleware.js";
+import { middlewareErrorHandler } from "./middleware.js";
 import { chirpyStateData } from "./config.js";
 import { validateChirp } from "./handle_chirps.js";
 const app = express();
@@ -13,6 +14,7 @@ app.get("/api/healthz", handlerReadiness);
 app.post("/api/validate_chirp", validateChirp);
 app.get("/admin/metrics", handlerRequestCount);
 app.post("/admin/reset", handlerResetRequestCount);
+app.use(middlewareErrorHandler);
 app.listen(PORT, () => {
     console.log(`Server is running at http://localhost:${PORT}`);
 });

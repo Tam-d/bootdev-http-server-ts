@@ -11,3 +11,9 @@ export function middlewareMetricsInc(req, res, next) {
     chirpyStateData.fileserverHits++;
     next();
 }
+export function middlewareErrorHandler(err, req, res, next) {
+    console.error(err.message);
+    res.status(500).json({
+        error: "Something went wrong on our end",
+    });
+}

@@ -1,4 +1,5 @@
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
+import { nextTick } from "node:process";
 
 let forbiddenWords = [
     "kerfuffle",
@@ -6,7 +7,7 @@ let forbiddenWords = [
     "fornax"
 ];
 
-export async function validateChirp(req: Request, res: Response) : Promise<void> {
+export async function validateChirp(req: Request, res: Response, next: NextFunction) : Promise<void> {
     let body = req.body;
 
     try {
@@ -17,10 +18,11 @@ export async function validateChirp(req: Request, res: Response) : Promise<void>
         res.send(JSON.stringify({"cleanedBody": sanitizeChirp(body.body)}));   
     }
     catch (error) {
-        res.set("Content-Type", "application/json");
-        res.status(400).send(
-            JSON.stringify({"error": (error as Error).message})
-        );
+        // res.set("Content-Type", "application/json");
+        // res.status(400).send(
+        //     JSON.stringify({"error": (error as Error).message})
+        // );
+        next(error);
     }
 }
 

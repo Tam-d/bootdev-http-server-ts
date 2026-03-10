@@ -3,7 +3,7 @@ let forbiddenWords = [
     "sharbert",
     "fornax"
 ];
-export async function validateChirp(req, res) {
+export async function validateChirp(req, res, next) {
     let body = req.body;
     try {
         if (!(body.body.length <= 140)) {
@@ -13,8 +13,11 @@ export async function validateChirp(req, res) {
         res.send(JSON.stringify({ "cleanedBody": sanitizeChirp(body.body) }));
     }
     catch (error) {
-        res.set("Content-Type", "application/json");
-        res.status(400).send(JSON.stringify({ "error": error.message }));
+        // res.set("Content-Type", "application/json");
+        // res.status(400).send(
+        //     JSON.stringify({"error": (error as Error).message})
+        // );
+        next(error);
     }
 }
 function sanitizeChirp(chirp) {

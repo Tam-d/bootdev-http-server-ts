@@ -3,6 +3,7 @@ import { Request, Response } from "express";
 
 import { middlewareLogResponses } from "./middleware.js";
 import { middlewareMetricsInc } from "./middleware.js";
+import { middlewareErrorHandler } from "./middleware.js";
 
 import { chirpyStateData } from "./config.js";
 
@@ -21,6 +22,8 @@ app.post("/api/validate_chirp", validateChirp)
 
 app.get("/admin/metrics", handlerRequestCount);
 app.post("/admin/reset", handlerResetRequestCount);
+
+app.use(middlewareErrorHandler);
 
 app.listen(PORT, () => {
   console.log(`Server is running at http://localhost:${PORT}`);

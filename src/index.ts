@@ -16,12 +16,40 @@ app.listen(PORT, () => {
 });
 
 app.get("/api/healthz", handlerReadiness);
+app.post("/api/validate_chirp", handlerValidateChirp)
+
 app.get("/admin/metrics", handlerRequestCount);
-app.post("/admin/reset", handlerResetRequestCount)
+app.post("/admin/reset", handlerResetRequestCount);
 
 async function handlerReadiness(req: Request, res: Response) : Promise<void> {
     res.set("Content-Type", "text/plain; charset=utf-8");
     res.send("OK");
+}
+
+async function handlerValidateChirp(req: Request, res: Response) : Promise<void> {
+    let body = "";
+
+    req.on("data", (data) => {
+        body += data;
+    });
+
+    req.on("end", () => {
+        try {
+            const parsedBody = JSON.parse(body);
+
+            if(!(parsedBody.body.length <= 140)) {
+                throw Error("Chirp is too long")
+            }
+            res.set("Content-Type", "application/json");
+            res.send(JSON.stringify({"valid": true}));
+            
+        } catch (error) {
+            res.set("Content-Type", "application/json");
+            res.status(400).send(
+                JSON.stringify({"error": (error as Error).message})
+            );
+        }
+    });
 }
 
 async function handlerRequestCount(req: Request, res: Response) : Promise<void> {

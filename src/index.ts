@@ -44,9 +44,6 @@ async function handlerResetRequestCount(req: Request, res: Response) : Promise<v
 
 function middlewareLogResponses(req: Request, res: Response, next: NextFunction) : void {
     res.on("finish", () => {
-
-        console.log(res.statusCode);
-
         if(res.statusCode !== 200) {
             console.log(`[NON-OK] ${req.method} ${req.url} - Status: ${res.statusCode}}`);
         } 

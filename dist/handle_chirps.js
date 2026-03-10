@@ -1,3 +1,4 @@
+import { Error400 } from "./error.js";
 let forbiddenWords = [
     "kerfuffle",
     "sharbert",
@@ -7,16 +8,12 @@ export async function validateChirp(req, res, next) {
     let body = req.body;
     try {
         if (!(body.body.length <= 140)) {
-            throw Error("Chirp is too long");
+            throw new Error400("Chirp is too long. Max length is 140");
         }
         res.set("Content-Type", "application/json");
         res.send(JSON.stringify({ "cleanedBody": sanitizeChirp(body.body) }));
     }
     catch (error) {
-        // res.set("Content-Type", "application/json");
-        // res.status(400).send(
-        //     JSON.stringify({"error": (error as Error).message})
-        // );
         next(error);
     }
 }

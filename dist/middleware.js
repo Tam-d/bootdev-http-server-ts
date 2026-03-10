@@ -1,4 +1,5 @@
 import { chirpyStateData } from "./config.js";
+import { Error400 } from "./error.js";
 export function middlewareLogResponses(req, res, next) {
     res.on("finish", () => {
         if (res.statusCode !== 200) {
@@ -13,7 +14,14 @@ export function middlewareMetricsInc(req, res, next) {
 }
 export function middlewareErrorHandler(err, req, res, next) {
     console.error(err.message);
-    res.status(500).json({
-        error: "Something went wrong on our end",
-    });
+    if (err instanceof Error400) {
+        res.status(400).json({
+            error: err.message,
+        });
+    }
+    else {
+        res.status(500).json({
+            error: "Something went wrong on our end",
+        });
+    }
 }

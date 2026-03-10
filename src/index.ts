@@ -9,6 +9,13 @@ import { chirpyConfig } from "./config.js";
 
 import { validateChirp } from "./handle_chirps.js";
 
+import postgres from "postgres";
+import { migrate } from "drizzle-orm/postgres-js/migrator";
+import { drizzle } from "drizzle-orm/postgres-js";
+
+const migrationClient = postgres(chirpyConfig.dbConfig.dbUrl, { max: 1 });
+await migrate(drizzle(migrationClient), chirpyConfig.dbConfig.migrationConfig);
+
 const app = express();
 const PORT = 8080;
 

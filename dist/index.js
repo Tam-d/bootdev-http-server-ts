@@ -1,5 +1,6 @@
 import express from "express";
 import { chirpyStateData } from "./config.js";
+import { validateChirp } from "./handle_chirps.js";
 const app = express();
 const PORT = 8080;
 app.use(express.json());
@@ -10,26 +11,12 @@ app.listen(PORT, () => {
     console.log(`Server is running at http://localhost:${PORT}`);
 });
 app.get("/api/healthz", handlerReadiness);
-app.post("/api/validate_chirp", handlerValidateChirp);
+app.post("/api/validate_chirp", validateChirp);
 app.get("/admin/metrics", handlerRequestCount);
 app.post("/admin/reset", handlerResetRequestCount);
 async function handlerReadiness(req, res) {
     res.set("Content-Type", "text/plain; charset=utf-8");
     res.send("OK");
-}
-async function handlerValidateChirp(req, res) {
-    let body = req.body;
-    try {
-        if (!(body.body.length <= 140)) {
-            throw Error("Chirp is too long");
-        }
-        res.set("Content-Type", "application/json");
-        res.send(JSON.stringify({ "valid": true }));
-    }
-    catch (error) {
-        res.set("Content-Type", "application/json");
-        res.status(400).send(JSON.stringify({ "error": error.message }));
-    }
 }
 async function handlerRequestCount(req, res) {
     res.set("Content-Type", "text/html; charset=utf-8");

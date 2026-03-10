@@ -7,13 +7,13 @@ app.use(express.json());
 app.use("/app", middlewareMetricsInc);
 app.use("/app", express.static("./src/app"));
 app.use(middlewareLogResponses);
-app.listen(PORT, () => {
-    console.log(`Server is running at http://localhost:${PORT}`);
-});
 app.get("/api/healthz", handlerReadiness);
 app.post("/api/validate_chirp", validateChirp);
 app.get("/admin/metrics", handlerRequestCount);
 app.post("/admin/reset", handlerResetRequestCount);
+app.listen(PORT, () => {
+    console.log(`Server is running at http://localhost:${PORT}`);
+});
 async function handlerReadiness(req, res) {
     res.set("Content-Type", "text/plain; charset=utf-8");
     res.send("OK");

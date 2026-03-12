@@ -12,7 +12,7 @@ import { validateChirp } from "./handle_chirps.js";
 import postgres from "postgres";
 import { migrate } from "drizzle-orm/postgres-js/migrator";
 import { drizzle } from "drizzle-orm/postgres-js";
-import { handlerCreateUser } from "./handle_users.js";
+import { handlerCreateUser } from "./api/users.js";
 import { deleteAllUsers } from "./db/queries/users.js";
 
 const migrationClient = postgres(chirpyConfig.dbConfig.dbUrl, { max: 1 });

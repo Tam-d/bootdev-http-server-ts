@@ -12,6 +12,8 @@ import { validateChirp } from "./handle_chirps.js";
 import postgres from "postgres";
 import { migrate } from "drizzle-orm/postgres-js/migrator";
 import { drizzle } from "drizzle-orm/postgres-js";
+import { handlerCreateUser } from "./handle_users.js";
+import { deleteAllUsers } from "./db/queries/users.js";
 
 const migrationClient = postgres(chirpyConfig.dbConfig.dbUrl, { max: 1 });
 await migrate(drizzle(migrationClient), chirpyConfig.dbConfig.migrationConfig);
@@ -25,7 +27,8 @@ app.use("/app", express.static("./src/app"));
 app.use(middlewareLogResponses);
 
 app.get("/api/healthz", handlerReadiness);
-app.post("/api/validate_chirp", validateChirp)
+app.post("/api/validate_chirp", validateChirp);
+app.post("/api/users", handlerCreateUser);
 
 app.get("/admin/metrics", handlerRequestCount);
 app.post("/admin/reset", handlerResetRequestCount);
@@ -55,6 +58,8 @@ async function handlerRequestCount(req: Request, res: Response) : Promise<void> 
 
 async function handlerResetRequestCount(req: Request, res: Response) : Promise<void> {
     chirpyConfig.apiConfig.fileserverHits = 0;
+
+    deleteAllUsers();
     res.set("Content-Type", "text/plain; charset=utf-8");
     res.send("OK");
 }

@@ -57,8 +57,14 @@ async function handlerRequestCount(req: Request, res: Response) : Promise<void> 
 }
 
 async function handlerResetRequestCount(req: Request, res: Response) : Promise<void> {
-    chirpyConfig.apiConfig.fileserverHits = 0;
+    if(chirpyConfig.apiConfig.platform !== "dev") {
+        res.status(403);
+        res.set("Content-Type", "text/plain; charset=utf-8");
+        res.send("Forbidden");
+        return;
+    }
 
+    chirpyConfig.apiConfig.fileserverHits = 0;
     deleteAllUsers();
     res.set("Content-Type", "text/plain; charset=utf-8");
     res.send("OK");

@@ -4,7 +4,8 @@ import type { MigrationConfig } from "drizzle-orm/migrator";
 
 type APIConfig = {
   fileserverHits: number,
-  dbURL: string
+  dbURL: string,
+  platform: string
 };
 
 type DBConfig = {
@@ -19,7 +20,8 @@ const migrationConfig: MigrationConfig = {
 export const chirpyConfig = {
   apiConfig: {  
     fileserverHits: 0,
-    dbURL: envOrThrow("DB_URL")
+    dbURL: envOrThrow("DB_URL"),
+    platform: envOrThrow("PLATFORM")
   },
   dbConfig: {
     dbUrl: envOrThrow("DB_URL"),

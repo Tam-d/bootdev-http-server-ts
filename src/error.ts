@@ -21,3 +21,9 @@ export class Error404 extends Error {
         super(message);
     }
 }
+
+export class Error500 extends Error {
+    constructor(message: string) {
+        super(message);
+    }
+}

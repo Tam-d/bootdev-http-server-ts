@@ -7,8 +7,6 @@ import { middlewareErrorHandler } from "./middleware.js";
 
 import { chirpyConfig } from "./config.js";
 
-import { validateChirp } from "./handle_chirps.js";
-
 import postgres from "postgres";
 import { migrate } from "drizzle-orm/postgres-js/migrator";
 import { drizzle } from "drizzle-orm/postgres-js";
@@ -28,7 +26,6 @@ app.use("/app", express.static("./src/app"));
 app.use(middlewareLogResponses);
 
 app.get("/api/healthz", handlerReadiness);
-app.post("/api/validate_chirp", validateChirp);
 app.post("/api/chirps", handlerCreateChirp);
 app.post("/api/users", handlerCreateUser);
 

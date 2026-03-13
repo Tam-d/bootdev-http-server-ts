@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { createUser } from "../db/queries/users.js";
+import { createUser, deleteAllUsers } from "../db/queries/users.js";
 import { NewUser } from "../db/schema";
 
 export async function handlerCreateUser(req: Request, res: Response) : Promise<void> {
@@ -19,4 +19,8 @@ export async function handlerCreateUser(req: Request, res: Response) : Promise<v
     catch(e) {
         console.log((e as Error).message);
     }
+}
+
+export async function handlerDeleteUsers() {
+    await deleteAllUsers();
 }

@@ -13,8 +13,9 @@ import { drizzle } from "drizzle-orm/postgres-js";
 
 import { handlerReadiness } from "./api/readiness.js";
 import { handlerRequestCount } from "./api/metics.js";
-import { handlerCreateUser, handlerDeleteUsers } from "./api/users.js";
-import { handlerCreateChirp, handlerDeleteChirps } from "./api/chirps.js";
+import { handlerCreateUser } from "./api/users.js";
+import { handlerCreateChirp } from "./api/chirps.js";
+import { handlerResetRequestCount } from "./api/reset.js";
 
 const migrationClient = postgres(chirpyConfig.dbConfig.dbUrl, { max: 1 });
 await migrate(drizzle(migrationClient), chirpyConfig.dbConfig.migrationConfig);
@@ -37,18 +38,4 @@ app.listen(PORT, () => {
   console.log(`Server is running at http://localhost:${PORT}`);
 });
 
-async function handlerResetRequestCount(req: Request, res: Response) : Promise<void> {
-    if(chirpyConfig.apiConfig.platform !== "dev") {
-        res.status(403);
-        res.set("Content-Type", "text/plain; charset=utf-8");
-        res.send("Forbidden");
-        return;
-    }
-
-    chirpyConfig.apiConfig.fileserverHits = 0;
-    handlerDeleteChirps();
-    handlerDeleteUsers();
-    res.set("Content-Type", "text/plain; charset=utf-8");
-    res.send("OK");
-}
 

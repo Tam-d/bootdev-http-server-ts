@@ -25,8 +25,7 @@ app.use(express.json());
 app.use(middlewareLogResponses);
 app.use(middlewareErrorHandler);
 
-app.use("/app", middlewareMetricsInc);
-app.use("/app", express.static("./src/app"));
+app.use("/app", middlewareMetricsInc, express.static("./src/app"));
 app.get("/api/healthz", handlerReadiness);
 app.post("/api/chirps", handlerCreateChirp);
 app.post("/api/users", handlerCreateUser);

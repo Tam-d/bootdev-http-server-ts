@@ -1,6 +1,6 @@
 import type { Request, Response, NextFunction } from "express";
 import { chirpyConfig } from "./config.js";
-import { Error400 } from "./error.js";
+import { Error400, InternalServerError } from "./error.js";
 
 export function middlewareLogResponses(req: Request, res: Response, next: NextFunction) : void {
     res.on("finish", () => {
@@ -28,6 +28,11 @@ export function middlewareErrorHandler(
 
     if(err instanceof Error400) {
         res.status(400).json({
+            error: err.message,
+        });
+    }
+    else if(err instanceof InternalServerError) {
+        res.status(500).json({
             error: err.message,
         });
     }

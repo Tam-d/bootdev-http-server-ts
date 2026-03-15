@@ -22,7 +22,7 @@ export class Error404 extends Error {
     }
 }
 
-export class Error500 extends Error {
+export class InternalServerError extends Error {
     constructor(message: string) {
         super(message);
     }

@@ -15,7 +15,8 @@ export type NewUser = typeof users.$inferInsert;
 export const chirps = pgTable("chirps", {
   id: uuid("id").primaryKey().defaultRandom(),
   body:  varchar("body", { length: 140 }).notNull(),
-  user_id: uuid("user_id").references(()=> users.id),
+  userId: uuid("user_id")
+    .references(()=> users.id, { onDelete: "cascade" }),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at")
     .notNull()

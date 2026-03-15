@@ -9,7 +9,3 @@ export async function createChirp(chirp: NewChirp) {
         .returning();
     return result;
 }
-
-export async function deleteAllChirps() {
-  await db.delete(chirps);
-}

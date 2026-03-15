@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { Error400, Error500 } from "../error.js";
-import { createChirp, deleteAllChirps } from "../db/queries/chirps.js";
+import { createChirp } from "../db/queries/chirps.js";
 import { NewChirp } from "../db/schema.js";
 
 
@@ -10,7 +10,7 @@ export async function handlerCreateChirp(req: Request, res: Response, next: Next
     try {
         const newChirp: NewChirp = {
             body: validateChirp(payload.body),
-            user_id: payload.userId
+            userId: payload.userId
         }
 
         const chirp = await createChirp(newChirp);
@@ -22,13 +22,7 @@ export async function handlerCreateChirp(req: Request, res: Response, next: Next
         res.status(201);
         res.set("Content-Type", "application/json");
         res.send(JSON.stringify(
-            {
-                "id": chirp.id,
-                "createdAt": chirp.createdAt,
-                "updatedAt": chirp.updatedAt,
-                "body": chirp.body,
-                "userId": chirp.user_id
-            }
+            chirp
         ));  
     }
     catch(error) {
@@ -36,10 +30,6 @@ export async function handlerCreateChirp(req: Request, res: Response, next: Next
         console.log((error as Error).cause);
         next(error);
     }
-}
-
-export async function handlerDeleteChirps() {
-    await deleteAllChirps()
 }
 
 function validateChirp(chirp: string) : string {

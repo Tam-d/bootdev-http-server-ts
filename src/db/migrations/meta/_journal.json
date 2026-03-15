@@ -15,6 +15,13 @@
       "when": 1773370925087,
       "tag": "0001_freezing_black_queen",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1773547100379,
+      "tag": "0002_steep_thing",
+      "breakpoints": true
     }
   ]
 }

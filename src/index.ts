@@ -12,6 +12,7 @@ import { migrate } from "drizzle-orm/postgres-js/migrator";
 import { drizzle } from "drizzle-orm/postgres-js";
 
 import { handlerReadiness } from "./api/readiness.js";
+import { handlerRequestCount } from "./api/metics.js";
 import { handlerCreateUser, handlerDeleteUsers } from "./api/users.js";
 import { handlerCreateChirp, handlerDeleteChirps } from "./api/chirps.js";
 
@@ -35,18 +36,6 @@ app.post("/admin/reset", handlerResetRequestCount);
 app.listen(PORT, () => {
   console.log(`Server is running at http://localhost:${PORT}`);
 });
-
-async function handlerRequestCount(req: Request, res: Response) : Promise<void> {
-    res.set("Content-Type", "text/html; charset=utf-8");
-    res.send(
-        `<html>
-        <body>
-            <h1>Welcome, Chirpy Admin</h1>
-            <p>Chirpy has been visited ${chirpyConfig.apiConfig.fileserverHits} times!</p>
-        </body>
-        </html>`
-    );
-}
 
 async function handlerResetRequestCount(req: Request, res: Response) : Promise<void> {
     if(chirpyConfig.apiConfig.platform !== "dev") {

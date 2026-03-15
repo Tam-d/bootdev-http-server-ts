@@ -10,6 +10,8 @@ import { chirpyConfig } from "./config.js";
 import postgres from "postgres";
 import { migrate } from "drizzle-orm/postgres-js/migrator";
 import { drizzle } from "drizzle-orm/postgres-js";
+
+import { handlerReadiness } from "./api/readiness.js";
 import { handlerCreateUser, handlerDeleteUsers } from "./api/users.js";
 import { handlerCreateChirp, handlerDeleteChirps } from "./api/chirps.js";
 
@@ -36,11 +38,6 @@ app.use(middlewareErrorHandler);
 app.listen(PORT, () => {
   console.log(`Server is running at http://localhost:${PORT}`);
 });
-
-async function handlerReadiness(req: Request, res: Response) : Promise<void> {
-    res.set("Content-Type", "text/plain; charset=utf-8");
-    res.send("OK");
-}
 
 async function handlerRequestCount(req: Request, res: Response) : Promise<void> {
     res.set("Content-Type", "text/html; charset=utf-8");

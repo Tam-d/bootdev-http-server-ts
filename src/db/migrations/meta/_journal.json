@@ -29,6 +29,13 @@
       "when": 1773555335088,
       "tag": "0003_lazy_silver_centurion",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1773555561996,
+      "tag": "0004_big_secret_warriors",
+      "breakpoints": true
     }
   ]
 }

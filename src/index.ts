@@ -22,18 +22,16 @@ const app = express();
 const PORT = 8080;
 
 app.use(express.json());
+app.use(middlewareLogResponses);
+app.use(middlewareErrorHandler);
+
 app.use("/app", middlewareMetricsInc);
 app.use("/app", express.static("./src/app"));
-app.use(middlewareLogResponses);
-
 app.get("/api/healthz", handlerReadiness);
 app.post("/api/chirps", handlerCreateChirp);
 app.post("/api/users", handlerCreateUser);
-
 app.get("/admin/metrics", handlerRequestCount);
 app.post("/admin/reset", handlerResetRequestCount);
-
-app.use(middlewareErrorHandler);
 
 app.listen(PORT, () => {
   console.log(`Server is running at http://localhost:${PORT}`);

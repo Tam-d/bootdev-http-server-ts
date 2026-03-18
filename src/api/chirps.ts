@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { Error400, InternalServerError } from "../error.js";
 import { NewChirp } from "../db/schema.js";
-import { createChirp, getChirps } from "../db/queries/chirps.js";
+import { createChirp, getChirp, getChirps } from "../db/queries/chirps.js";
 
 export async function handlerCreateChirp(req: Request, res: Response, next: NextFunction) : Promise<void> {
     const payload = req.body;
@@ -27,6 +27,27 @@ export async function handlerCreateChirp(req: Request, res: Response, next: Next
     catch(error) {
         console.log((error as Error).message);
         console.log((error as Error).cause);
+        next(error);
+    }
+}
+
+export async function handlerGetChirp(req: Request, res: Response, next: NextFunction) : Promise<void>{
+    try {
+        const chirpId = req.params.chirpId;
+
+        const chirp: NewChirp = await getChirp(chirpId as string);
+
+        if(chirp === undefined) {
+            throw new InternalServerError("Internal error while retrieving chirps.");
+        }
+
+        res.status(200);
+        res.set("Content-Type", "application/json");
+        res.send(JSON.stringify(
+            chirp
+        ));
+    }
+    catch(error) {
         next(error);
     }
 }

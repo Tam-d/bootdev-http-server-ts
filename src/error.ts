@@ -4,7 +4,8 @@ export class Error400 extends Error {
     }
  }
 
-export class Error401 extends Error {
+ //401
+export class UnauthorizedError extends Error {
     constructor(message: string) {
         super(message);
     }
@@ -22,6 +23,7 @@ export class Error404 extends Error {
     }
 }
 
+//500
 export class InternalServerError extends Error {
     constructor(message: string) {
         super(message);

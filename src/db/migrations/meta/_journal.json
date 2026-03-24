@@ -36,6 +36,20 @@
       "when": 1773555561996,
       "tag": "0004_big_secret_warriors",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1773799148827,
+      "tag": "0005_sticky_junta",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1773866725365,
+      "tag": "0006_flowery_inhumans",
+      "breakpoints": true
     }
   ]
 }

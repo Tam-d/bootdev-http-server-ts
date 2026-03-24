@@ -16,6 +16,7 @@ import { handlerRequestCount } from "./api/metics.js";
 import { handlerCreateUser } from "./api/users.js";
 import { handlerCreateChirp, handlerGetChirp, handlerGetChirps } from "./api/chirps.js";
 import { handlerResetRequestCount } from "./api/reset.js";
+import { handlerUserLogin } from "./api/login.js";
 
 const migrationClient = postgres(chirpyConfig.dbConfig.dbUrl, { max: 1 });
 await migrate(drizzle(migrationClient), chirpyConfig.dbConfig.migrationConfig);
@@ -31,6 +32,7 @@ app.get("/api/healthz", handlerReadiness);
 app.post("/api/chirps", handlerCreateChirp);
 app.get("/api/chirps", handlerGetChirps);
 app.get("/api/chirps/:chirpId", handlerGetChirp)
+app.post("/api/login", handlerUserLogin);
 app.post("/api/users", handlerCreateUser);
 app.get("/admin/metrics", handlerRequestCount);
 app.post("/admin/reset", handlerResetRequestCount);

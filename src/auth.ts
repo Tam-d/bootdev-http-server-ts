@@ -1,7 +1,11 @@
 import * as argon2 from "argon2";
 import jwt, { JsonWebTokenError, sign, verify } from "jsonwebtoken";
 import type { JwtPayload } from "jsonwebtoken";
-import { InternalServerError} from "./error.js";
+import { InternalServerError, UnauthorizedError} from "./error.js";
+
+type Payload = Pick<JwtPayload, "iss" | "sub" | "iat" | "exp">;
+
+const ISSUER = "chirpy";
 
 
 export async function hashPassword(password: string): Promise<string> {
@@ -26,18 +30,36 @@ export async function checkPasswordHash(
 }
 
 export function makeJWT(userID: string, expiresIn: number, secret: string): string {
-    type Payload = Pick<JwtPayload, "iss" | "sub" | "iat" | "exp">;
+    const iat = Math.floor(Date.now() / 1000);
+    const eat = iat + expiresIn;
 
     const jwtPayload : Payload = {
-        "iss": "chirpy",
+        "iss": ISSUER,
         "sub": userID,
-        "iat": Math.floor(Date.now() / 1000),
-        "exp": Math.floor(Date.now() / 1000) + expiresIn
+        "iat": iat,
+        "exp": eat
     }
 
-    return sign(jwtPayload, secret);
+    return sign(jwtPayload satisfies Payload, secret);
 }
 
 export function validateJWT(tokenString: string, secret: string): string {
-    return JSON.stringify(verify(tokenString, secret));
+    let jwtPayload: Payload;
+
+    try {
+        jwtPayload = verify(tokenString, secret) as Payload
+    }
+    catch(error) {
+        throw new UnauthorizedError("Token is invalid");
+    }
+
+    if (jwtPayload.iss !== ISSUER) {
+        throw new UnauthorizedError("Invalid issuer");
+    }
+
+    if (!jwtPayload.sub) {
+        throw new UnauthorizedError("No user ID in token");
+    }
+    
+    return jwtPayload.sub;
 }

@@ -1,5 +1,5 @@
 import * as argon2 from "argon2";
-import jwt, { JsonWebTokenError, sign, verify } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import type { JwtPayload } from "jsonwebtoken";
 import { InternalServerError, UnauthorizedError} from "./error.js";
 
@@ -40,14 +40,14 @@ export function makeJWT(userID: string, expiresIn: number, secret: string): stri
         "exp": eat
     }
 
-    return sign(jwtPayload satisfies Payload, secret);
+    return jwt.sign(jwtPayload satisfies Payload, secret);
 }
 
 export function validateJWT(tokenString: string, secret: string): string {
     let jwtPayload: Payload;
 
     try {
-        jwtPayload = verify(tokenString, secret) as Payload
+        jwtPayload = jwt.verify(tokenString, secret) as Payload
     }
     catch(error) {
         throw new UnauthorizedError("Token is invalid");

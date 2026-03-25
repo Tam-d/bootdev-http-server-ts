@@ -45,5 +45,5 @@ describe("Jwt functions", () => {
         expect(() => validateJWT(validToken, wrongSecret)).toThrow(
             UnauthorizedError,
         );
-  });
+    });
 });

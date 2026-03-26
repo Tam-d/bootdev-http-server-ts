@@ -1,4 +1,5 @@
-export class Error400 extends Error {
+//400
+export class BadRequestError extends Error {
     constructor(message: string) {
         super(message);
     }

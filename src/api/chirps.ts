@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { chirpyConfig } from "../config.js";
-import { Error400, InternalServerError, UnauthorizedError } from "../error.js";
+import { BadRequestError, InternalServerError, UnauthorizedError } from "../error.js";
 import { NewChirp } from "../db/schema.js";
 import { createChirp, getChirp, getChirps } from "../db/queries/chirps.js";
 import { getBearerToken, validateJWT } from "../auth.js";
@@ -70,8 +70,7 @@ export async function handlerGetChirps(req: Request, res: Response, next: NextFu
 
 function validateChirp(chirp: string) : string {
     if(!(chirp.length <= 140)) {
-        //TODO: update error code
-        throw new Error400("Chirp is too long. Max length is 140");
+        throw new BadRequestError("Chirp is too long. Max length is 140");
     }
     return sanitizeChirp(chirp)
 }

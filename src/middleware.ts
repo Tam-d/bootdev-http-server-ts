@@ -1,6 +1,6 @@
 import type { Request, Response, NextFunction } from "express";
 import { chirpyConfig } from "./config.js";
-import { Error400, InternalServerError, UnauthorizedError } from "./error.js";
+import { BadRequestError, InternalServerError, UnauthorizedError } from "./error.js";
 import { respondWithError } from "./respond.js";
 
 export function middlewareLogResponses(req: Request, res: Response, next: NextFunction) : void {
@@ -32,7 +32,7 @@ export function middlewareErrorHandler(
     console.log(`${error.message}`);
     let errorCode = 500;
 
-    if(error instanceof Error400) {
+    if(error instanceof BadRequestError) {
         errorCode = 400;
     }
     else if( error instanceof UnauthorizedError) {

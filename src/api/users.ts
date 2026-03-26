@@ -3,28 +3,40 @@ import { createUser, deleteAllUsers, getUser } from "../db/queries/users.js";
 import { NewUser } from "../db/schema";
 import { hashPassword } from "../auth.js"
 import { respondWithJSON } from "../respond.js";
+import { BadRequestError, InternalServerError } from "../error.js";
+
+export type CreatedUser = Omit<NewUser, "hashedPassword">;
 
 export async function handlerCreateUser(req: Request, res: Response, next: NextFunction) : Promise<void> {
-    type RequestBody = {
-        email: string,
-        password: string
-    }
-
-    type CreatedUser = Omit<NewUser, "hashedPassword">;
-
-    const reqBody : RequestBody = req.body
-
     try {
-        const hashedPassword = await hashPassword(reqBody.password)
-
-        const newUser: NewUser = {
-            email: reqBody.email,
-            hashedPassword: hashedPassword
+        type Payload = {
+            email: string,
+            password: string
         }
 
-        const createdUser : CreatedUser  = await createUser(newUser);
+        const payload : Payload = req.body
 
-        respondWithJSON(res,201, createdUser);
+        if(!payload.email || !payload.password) {
+            throw new BadRequestError("Must provide email and password");
+        }
+
+        const hashedPassword = await hashPassword(payload.password)
+
+        const newUser = await createUser({
+            email: payload.email,
+            hashedPassword: hashedPassword
+        } satisfies NewUser);
+
+        if(!newUser) {
+            throw new InternalServerError("Unable to create user");
+        }
+
+        respondWithJSON(res,201, {
+            id: newUser.id,
+            email: newUser.email,
+            createdAt: newUser.createdAt,
+            updatedAt: newUser.updatedAt,
+        } satisfies CreatedUser);
     }
     catch(error) {
         next(error)

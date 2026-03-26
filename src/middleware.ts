@@ -1,6 +1,7 @@
 import type { Request, Response, NextFunction } from "express";
 import { chirpyConfig } from "./config.js";
 import { Error400, InternalServerError, UnauthorizedError } from "./error.js";
+import { respondWithError } from "./respond.js";
 
 export function middlewareLogResponses(req: Request, res: Response, next: NextFunction) : void {
     res.on("finish", () => {
@@ -22,34 +23,27 @@ export function middlewareMetricsInc(req: Request, res: Response, next: NextFunc
 }
 
 export function middlewareErrorHandler(
-  err: Error,
+  error: Error,
   req: Request,
   res: Response,
   next: NextFunction,
 ) {
     console.error(`Entered error middleware.`);
-    console.log(`${err.message}`);
+    console.log(`${error.message}`);
+    let errorCode = 500;
 
-    if(err instanceof Error400) {
-        res.status(400).json({
-            error: err.message,
-        });
+    if(error instanceof Error400) {
+        errorCode = 400;
     }
-    else if( err instanceof UnauthorizedError) {
-        res.status(401).json({
-            error: err.message,
-        });
+    else if( error instanceof UnauthorizedError) {
+        errorCode = 401;
     }
-    else if(err instanceof InternalServerError) {
-        res.status(500).json({
-            error: err.message,
-        });
+    else if(error instanceof InternalServerError) {
+        errorCode = 500;
     }
     else {
-        res.status(500).json({
-            error: "Something went wrong on our end",
-        });
+        errorCode = 500;
     }
 
-
+    respondWithError(res, errorCode, error.message);
 }

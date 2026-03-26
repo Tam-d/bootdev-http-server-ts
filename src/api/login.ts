@@ -73,9 +73,6 @@ export async function handlerUserLogin(
         }
     }
     catch(error) {
-        console.log("Error from login");
-        console.log((error as Error).message);
-        console.log((error as Error).cause);
         next(error);
     }
 }

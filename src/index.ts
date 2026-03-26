@@ -16,7 +16,7 @@ import { handlerRequestCount } from "./api/metics.js";
 import { handlerCreateUser } from "./api/users.js";
 import { handlerCreateChirp, handlerGetChirp, handlerGetChirps } from "./api/chirps.js";
 import { handlerResetRequestCount } from "./api/reset.js";
-import { handlerUserLogin } from "./api/login.js";
+import { handlerUserLogin } from "./api/auth.js";
 
 const migrationClient = postgres(chirpyConfig.dbConfig.dbUrl, { max: 1 });
 await migrate(drizzle(migrationClient), chirpyConfig.dbConfig.migrationConfig);

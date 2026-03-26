@@ -81,6 +81,7 @@ export async function handlerGetChirps(req: Request, res: Response, next: NextFu
 
 function validateChirp(chirp: string) : string {
     if(!(chirp.length <= 140)) {
+        //TODO: update error code
         throw new Error400("Chirp is too long. Max length is 140");
     }
     return sanitizeChirp(chirp)

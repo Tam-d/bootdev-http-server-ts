@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express";
-import { checkPasswordHash } from "../auth.js";
+import { chirpyConfig } from "../config.js";
+import { checkPasswordHash, makeJWT } from "../auth.js";
 import { NewUser } from "../db/schema.js";
 import { UnauthorizedError } from "../error.js";
 import { handlerGetUser } from "./users.js";
@@ -12,12 +13,14 @@ export async function handlerUserLogin(
 
     type RequestBody = {
         email: string,
-        password: string
+        password: string,
+        expiresInSeconds?: number
     }
 
     type SanitizedUser = Omit<NewUser, "hashedPassword">;
     
-    const reqBody : RequestBody = req.body
+    const reqBody : RequestBody = req.body;
+    let expiration = 3600;
 
     try {
         if( reqBody.email === undefined || typeof reqBody.email !== "string") {
@@ -26,30 +29,47 @@ export async function handlerUserLogin(
         if( reqBody.password === undefined || typeof reqBody.password !== "string") {
             throw new UnauthorizedError("Invalid or empty password");
         }
+        if(reqBody.expiresInSeconds && reqBody.expiresInSeconds < expiration) {
+            expiration = reqBody.expiresInSeconds;
+        } 
 
         const existingUser: NewUser = await handlerGetUser(reqBody.email);
 
-        if(existingUser.hashedPassword) {
-            const isPasswordMatch: boolean = await checkPasswordHash(
-                reqBody.password,
-                existingUser.hashedPassword
-            );
+        if(existingUser && existingUser.id) {
+            const jwtToken = makeJWT(
+                existingUser.id, 
+                expiration, 
+                chirpyConfig.apiConfig.jwtSecret
+            )
 
-            if(isPasswordMatch === false) {
-                console.log("Password match false!")
-                throw new UnauthorizedError("Unauthorized.");
-            }
+            if(existingUser.hashedPassword) {
+                const isPasswordMatch: boolean = await checkPasswordHash(
+                    reqBody.password,
+                    existingUser.hashedPassword
+                );
 
-            const { hashedPassword, ...sanitizedUser } = existingUser
+                if(isPasswordMatch === false) {
+                    console.log("Password match false!")
+                    throw new UnauthorizedError("Unauthorized.");
+                }
 
-            const user : SanitizedUser = sanitizedUser;
+                const { hashedPassword, ...sanitizedUser } = existingUser
 
-            res.status(200);
-            res.set("Content-Type", "application/json");
-            res.send(JSON.stringify(
-                user
-            ));
-        } 
+                const user : SanitizedUser = sanitizedUser;
+
+                res.status(200);
+                res.set("Content-Type", "application/json");
+                res.send(JSON.stringify(
+                    {
+                        id: user.id,
+                        createdAt: user.createdAt,
+                        updatedAt: user.updatedAt,
+                        email: user.email,
+                        token: jwtToken
+                    }
+                ));
+            } 
+        }
     }
     catch(error) {
         console.log("Error from login");

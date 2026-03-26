@@ -4,6 +4,7 @@ import { Error400, InternalServerError, UnauthorizedError } from "../error.js";
 import { NewChirp } from "../db/schema.js";
 import { createChirp, getChirp, getChirps } from "../db/queries/chirps.js";
 import { getBearerToken, validateJWT } from "../auth.js";
+import { respondWithJSON } from "../respond.js";
 
 export async function handlerCreateChirp(req: Request, res: Response, next: NextFunction) : Promise<void> {
     try {
@@ -26,11 +27,7 @@ export async function handlerCreateChirp(req: Request, res: Response, next: Next
             throw new InternalServerError(`Failed to create chirp`);
         }
         
-        res.status(201);
-        res.set("Content-Type", "application/json");
-        res.send(JSON.stringify(
-            chirp
-        ));  
+        respondWithJSON(res, 201, chirp);
     }
     catch(error) {
         console.log((error as Error).message);
@@ -49,11 +46,7 @@ export async function handlerGetChirp(req: Request, res: Response, next: NextFun
             throw new InternalServerError("Internal error while retrieving chirps.");
         }
 
-        res.status(200);
-        res.set("Content-Type", "application/json");
-        res.send(JSON.stringify(
-            chirp
-        ));
+        respondWithJSON(res, 200, chirp);
     }
     catch(error) {
         next(error);
@@ -68,11 +61,7 @@ export async function handlerGetChirps(req: Request, res: Response, next: NextFu
             throw new InternalServerError("Internal error while retrieving chirps.");
         }
 
-        res.status(200);
-        res.set("Content-Type", "application/json");
-        res.send(JSON.stringify(
-            chirps
-        ));
+        respondWithJSON(res, 200, chirps);
     }
     catch(error) {
         next(error);

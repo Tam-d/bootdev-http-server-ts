@@ -1,15 +1,23 @@
 import { Request, Response, NextFunction } from "express";
-import { Error400, InternalServerError } from "../error.js";
+import { chirpyConfig } from "../config.js";
+import { Error400, InternalServerError, UnauthorizedError } from "../error.js";
 import { NewChirp } from "../db/schema.js";
 import { createChirp, getChirp, getChirps } from "../db/queries/chirps.js";
+import { getBearerToken, validateJWT } from "../auth.js";
 
 export async function handlerCreateChirp(req: Request, res: Response, next: NextFunction) : Promise<void> {
-    const payload = req.body;
-    
     try {
+        const token = getBearerToken(req);
+        const userId = validateJWT(token, chirpyConfig.apiConfig.jwtSecret)
+        if(!userId) {
+            throw new UnauthorizedError("Unauthenticated users may not post, please login");
+        }
+
+        const payload = req.body;
+
         const newChirp: NewChirp = {
             body: validateChirp(payload.body),
-            userId: payload.userId
+            userId: userId
         }
 
         const chirp = await createChirp(newChirp);

@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { createUser, deleteAllUsers, getUser } from "../db/queries/users.js";
 import { NewUser } from "../db/schema";
 import { hashPassword } from "../auth.js"
+import { respondWithJSON } from "../respond.js";
 
 export async function handlerCreateUser(req: Request, res: Response, next: NextFunction) : Promise<void> {
     type RequestBody = {
@@ -23,11 +24,7 @@ export async function handlerCreateUser(req: Request, res: Response, next: NextF
 
         const createdUser : CreatedUser  = await createUser(newUser);
 
-        res.status(201);
-        res.set("Content-Type", "application/json");
-        res.send(JSON.stringify(
-            createdUser
-        ));
+        respondWithJSON(res,201, createdUser);
     }
     catch(error) {
         next(error)

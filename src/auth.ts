@@ -1,4 +1,5 @@
 import * as argon2 from "argon2";
+import { Request } from "express";
 import jwt from "jsonwebtoken";
 import type { JwtPayload } from "jsonwebtoken";
 import { InternalServerError, UnauthorizedError} from "./error.js";
@@ -62,4 +63,14 @@ export function validateJWT(tokenString: string, secret: string): string {
     }
     
     return jwtPayload.sub;
+}
+
+export function getBearerToken(req: Request): string {
+    const authHeader = req.headers.authorization;
+
+    if(authHeader === "" || authHeader === null || authHeader === undefined) {
+        throw new UnauthorizedError("No token found");
+    }
+
+    return authHeader.split(" ")[1];
 }

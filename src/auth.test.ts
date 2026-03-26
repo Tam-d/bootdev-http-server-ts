@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll } from "vitest";
-import { makeJWT, validateJWT, hashPassword, checkPasswordHash } from "./auth.js";
+import { makeJWT, validateJWT, hashPassword, checkPasswordHash, getBearerToken } from "./auth.js";
 import { UnauthorizedError } from "./error.js";
 
 describe("Password Hashing", () => {
@@ -43,6 +43,31 @@ describe("Jwt functions", () => {
 
     it("should throw an error when the token is signed with a wrong secret", () => {
         expect(() => validateJWT(validToken, wrongSecret)).toThrow(
+            UnauthorizedError,
+        );
+    });
+});
+
+describe("Get Auth Token", () => {
+    let validReq = {
+        headers: {
+            authorization: "Bearer super-secret-token"
+        },
+    } as any;
+
+    let invalidReq = {
+        headers: {
+            authorization: ""
+        }
+    } as any;
+
+    it("should extract the token from a valid request", () => {
+        const result = getBearerToken(validReq);
+        expect(result).toBe("super-secret-token");
+    });
+
+    it("should throw an error for an empty token string", () => {
+        expect(() => getBearerToken(invalidReq)).toThrow(
             UnauthorizedError,
         );
     });

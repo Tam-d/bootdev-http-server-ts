@@ -11,5 +11,5 @@ export function respondWithError(
     errorCode: number, 
     errorMsg: string
 ) {
-    respondWithJSON(res, errorCode, errorMsg);
+    respondWithJSON(res, errorCode, {error: errorMsg});
 }

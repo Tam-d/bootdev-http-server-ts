@@ -4,6 +4,7 @@ import { checkPasswordHash, makeJWT } from "../auth.js";
 import { NewUser } from "../db/schema.js";
 import { UnauthorizedError } from "../error.js";
 import { handlerGetUser } from "./users.js";
+import { respondWithJSON } from "../respond.js";
 
 export async function handlerUserLogin(
     req: Request, 
@@ -57,9 +58,9 @@ export async function handlerUserLogin(
 
                 const user : SanitizedUser = sanitizedUser;
 
-                res.status(200);
-                res.set("Content-Type", "application/json");
-                res.send(JSON.stringify(
+                respondWithJSON(
+                    res, 
+                    200, 
                     {
                         id: user.id,
                         createdAt: user.createdAt,
@@ -67,7 +68,7 @@ export async function handlerUserLogin(
                         email: user.email,
                         token: jwtToken
                     }
-                ));
+                );
             } 
         }
     }

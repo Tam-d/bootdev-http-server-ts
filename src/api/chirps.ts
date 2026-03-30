@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from "express";
 import { chirpyConfig } from "../config.js";
-import { BadRequestError, InternalServerError, UnauthorizedError } from "../error.js";
+import { BadRequestError, ForbiddenError, InternalServerError, NotFoundError, UnauthorizedError } from "../error.js";
 import { NewChirp } from "../db/schema.js";
-import { createChirp, getChirp, getChirps } from "../db/queries/chirps.js";
+import { createChirp, deleteChirp, getChirp, getChirps } from "../db/queries/chirps.js";
 import { getBearerToken, validateJWT } from "../auth.js";
 import { respondWithJSON } from "../respond.js";
 
@@ -43,7 +43,7 @@ export async function handlerGetChirp(req: Request, res: Response, next: NextFun
         const chirp: NewChirp = await getChirp(chirpId as string);
 
         if(chirp === undefined) {
-            throw new InternalServerError("Internal error while retrieving chirps.");
+            throw new NotFoundError("The requested resource does not exist");
         }
 
         respondWithJSON(res, 200, chirp);
@@ -66,6 +66,53 @@ export async function handlerGetChirps(req: Request, res: Response, next: NextFu
     catch(error) {
         next(error);
     }
+}
+
+export async function handlerDeleteChirp(
+    req: Request, 
+    res: Response, 
+    next: NextFunction) : Promise<void>{
+
+    try {
+        const accessToken = getBearerToken(req);
+        const userId = validateJWT(
+            accessToken, 
+            chirpyConfig.apiConfig.jwtSecret
+        )
+
+        if(!userId) {
+            throw new UnauthorizedError("Unauthenticated users may not post, please login");
+        }
+
+        const chirpId = req.params.chirpId;
+
+        if(typeof chirpId !== "string") {
+            throw new BadRequestError("Invalid chirp Id");
+        }
+
+        const chirp = await getChirp(chirpId);
+
+        console.log("the chirp: ", chirp);
+
+        if(chirp === undefined) {
+            throw new NotFoundError("The requested resource does not exist");
+        }
+
+        if(chirp.userId !== userId) {
+            throw new ForbiddenError("User does not own resource");
+        }
+
+        const deletedChirp = await deleteChirp(chirpId, userId);
+
+        res.status(204).send();
+
+    }
+    catch(error) {
+        next(error);
+    }
+
+
+    
 }
 
 function validateChirp(chirp: string) : string {

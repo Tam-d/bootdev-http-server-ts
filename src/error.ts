@@ -12,13 +12,15 @@ export class UnauthorizedError extends Error {
     }
 }
 
-export class Error403 extends Error {
+//403
+export class ForbiddenError extends Error {
     constructor(message: string) {
         super(message);
     }
 }
 
-export class Error404 extends Error {
+//404
+export class NotFoundError extends Error {
     constructor(message: string) {
         super(message);
     }

@@ -1,0 +1,1 @@
+ALTER TABLE "refresh_tokens" RENAME COLUMN "id" TO "token";

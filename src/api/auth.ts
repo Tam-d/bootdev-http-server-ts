@@ -1,10 +1,15 @@
 import { NextFunction, Request, Response } from "express";
 import { chirpyConfig } from "../config.js";
-import { checkPasswordHash, makeJWT } from "../auth.js";
-import { NewUser } from "../db/schema.js";
+import { checkPasswordHash, generateToken, makeJWT } from "../auth.js";
+import { NewUser, RefreshToken } from "../db/schema.js";
+import { insertRefreshToken } from "../db/queries/tokens.js";
 import { UnauthorizedError } from "../error.js";
 import { handlerGetUser } from "./users.js";
 import { respondWithJSON } from "../respond.js";
+
+const EXPIRATION_SECONDS = 3600;
+
+type LoginResponse = Omit<NewUser & { token: string, refreshToken: string}, "hashedPassword">;
 
 export async function handlerUserLogin(
     req: Request, 
@@ -12,67 +17,68 @@ export async function handlerUserLogin(
     next: NextFunction
 ) : Promise<void> {
 
-    type RequestBody = {
+    type Payload = {
         email: string,
         password: string,
-        expiresInSeconds?: number
     }
 
-    type SanitizedUser = Omit<NewUser, "hashedPassword">;
-    
-    const reqBody : RequestBody = req.body;
-    let expiration = 3600;
+    const payload : Payload = req.body;
 
     try {
-        if( reqBody.email === undefined || typeof reqBody.email !== "string") {
-            throw new UnauthorizedError("Invalid or empty email");
+        const user = await handlerGetUser(payload.email);
+
+        if(!user) {
+            throw new UnauthorizedError("Unable to authenticate user")
         }
-        if( reqBody.password === undefined || typeof reqBody.password !== "string") {
-            throw new UnauthorizedError("Invalid or empty password");
+
+        const isPasswordMatch: boolean = await checkPasswordHash(
+            payload.password,
+            user.hashedPassword
+        );
+
+        if(!isPasswordMatch) {
+            throw new UnauthorizedError("Unauthorized.");
         }
-        if(reqBody.expiresInSeconds && reqBody.expiresInSeconds < expiration) {
-            expiration = reqBody.expiresInSeconds;
-        } 
 
-        const existingUser: NewUser = await handlerGetUser(reqBody.email);
+        const { hashedPassword, ...authenticatedUser } = user
 
-        if(existingUser && existingUser.id) {
-            const jwtToken = makeJWT(
-                existingUser.id, 
-                expiration, 
-                chirpyConfig.apiConfig.jwtSecret
-            )
+        const accessToken = makeJWT(
+            user.id, 
+            EXPIRATION_SECONDS,
+            chirpyConfig.apiConfig.jwtSecret
+        )
 
-            if(existingUser.hashedPassword) {
-                const isPasswordMatch: boolean = await checkPasswordHash(
-                    reqBody.password,
-                    existingUser.hashedPassword
-                );
+        const refreshToken = await createRefreshToken(authenticatedUser.id);
 
-                if(isPasswordMatch === false) {
-                    console.log("Password match false!")
-                    throw new UnauthorizedError("Unauthorized.");
-                }
-
-                const { hashedPassword, ...sanitizedUser } = existingUser
-
-                const user : SanitizedUser = sanitizedUser;
-
-                respondWithJSON(
-                    res, 
-                    200, 
-                    {
-                        id: user.id,
-                        createdAt: user.createdAt,
-                        updatedAt: user.updatedAt,
-                        email: user.email,
-                        token: jwtToken
-                    }
-                );
-            } 
-        }
+        respondWithJSON(
+            res, 
+            200, 
+            {
+                id: authenticatedUser.id,
+                createdAt: authenticatedUser.createdAt,
+                updatedAt: authenticatedUser.updatedAt,
+                email: authenticatedUser.email,
+                token: accessToken,
+                refreshToken: refreshToken.token
+            } satisfies LoginResponse
+        );  
     }
     catch(error) {
         next(error);
     }
+}
+
+async function createRefreshToken(userId: string): Promise<RefreshToken>{
+    const token = generateToken()
+
+    const expiryDate = new Date();
+    expiryDate.setDate(expiryDate.getDate() + 60);
+
+    const refreshToken = await insertRefreshToken({
+        token: token,
+        userId: userId,
+        expiresAt: expiryDate,
+    } satisfies RefreshToken);
+
+    return refreshToken;
 }

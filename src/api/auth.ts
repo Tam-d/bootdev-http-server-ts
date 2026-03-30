@@ -1,15 +1,17 @@
 import { NextFunction, Request, Response } from "express";
 import { chirpyConfig } from "../config.js";
-import { checkPasswordHash, generateToken, makeJWT } from "../auth.js";
-import { NewUser, RefreshToken } from "../db/schema.js";
+import { checkPasswordHash, generateToken, getBearerToken, hashPassword, makeJWT, validateJWT } from "../auth.js";
+import { NewUser, RefreshToken, User } from "../db/schema.js";
 import { insertRefreshToken } from "../db/queries/tokens.js";
 import { UnauthorizedError } from "../error.js";
 import { handlerGetUser } from "./users.js";
 import { respondWithJSON } from "../respond.js";
+import { updateUser } from "../db/queries/users.js";
 
 const EXPIRATION_SECONDS = 3600;
 
 type LoginResponse = Omit<NewUser & { token: string, refreshToken: string}, "hashedPassword">;
+type UpdatedUser = Omit<User, "hashedPassword">
 
 export async function handlerUserLogin(
     req: Request, 
@@ -66,6 +68,54 @@ export async function handlerUserLogin(
     catch(error) {
         next(error);
     }
+}
+
+export async function handlerUpdateUserPW(
+    req: Request, 
+    res: Response,
+    next: NextFunction
+) : Promise<void> {
+
+    type Payload = {
+        email: string,
+        password: string,
+    }
+
+    const payload = req.body;
+
+    try {
+        const accessToken = getBearerToken(req);
+
+        const userId = validateJWT(
+            accessToken, 
+            chirpyConfig.apiConfig.jwtSecret
+        );
+
+        if(!userId) {
+            throw new UnauthorizedError("Unable to update email and pw");
+        }
+
+        const updatedUser = await updateUser({
+            id: userId,
+            email: payload.email,
+            hashedPassword: await hashPassword(payload.password)
+        } satisfies User);
+
+        respondWithJSON(
+            res, 
+            200, 
+            {
+                id: updatedUser.id,
+                createdAt: updatedUser.createdAt,
+                updatedAt: updatedUser.updatedAt,
+                email: updatedUser.email,
+            } satisfies UpdatedUser);
+
+    }
+    catch(error) {
+        next(error);
+    }
+
 }
 
 async function createRefreshToken(userId: string): Promise<RefreshToken>{

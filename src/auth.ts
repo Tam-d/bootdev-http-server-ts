@@ -1,4 +1,5 @@
 import * as argon2 from "argon2";
+import { randomBytes } from "crypto"
 import { Request } from "express";
 import jwt from "jsonwebtoken";
 import type { JwtPayload } from "jsonwebtoken";
@@ -63,6 +64,10 @@ export function validateJWT(tokenString: string, secret: string): string {
     }
     
     return jwtPayload.sub;
+}
+
+export function generateToken(): string {
+    return randomBytes(256).toString("hex");
 }
 
 export function getBearerToken(req: Request): string {

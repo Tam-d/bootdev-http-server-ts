@@ -12,14 +12,25 @@ export async function createChirp(chirp: NewChirp) {
 }
 
 export async function getChirp(chirpId: string) {
-    const [result] = 
-        await db.select()
-            .from(chirps)
-            .where(eq(chirps.id, chirpId));
+    const [result] = await db
+        .select()
+        .from(chirps)
+        .where(eq(chirps.id, chirpId));
     return result;
 }
 
 export async function getChirps() {
-    const result = await db.select().from(chirps).orderBy(asc(chirps.createdAt))
+    const result = await db
+        .select()
+        .from(chirps)
+        .orderBy(asc(chirps.createdAt))
+    return result;
+}
+
+export async function deleteChirp(chirpId: string, userId: string) {
+    const [result] = await db
+        .delete(chirps)
+        .where(eq(chirps.userId, userId))
+        .returning();
     return result;
 }

@@ -2,13 +2,13 @@ import { pgTable, timestamp, varchar, uuid, text } from "drizzle-orm/pg-core";
 
 export const users = pgTable("users", {
   id: uuid("id").primaryKey().defaultRandom(),
+  email: varchar("email", { length: 256 }).unique().notNull(),
+  hashedPassword: varchar("hashed_password").notNull().default(""),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at")
     .notNull()
     .defaultNow()
-    .$onUpdate(() => new Date()),
-  email: varchar("email", { length: 256 }).unique().notNull(),
-  hashedPassword: varchar("hashed_password").notNull().default("")
+    .$onUpdate(() => new Date())
 });
 
 export type NewUser = typeof users.$inferInsert;

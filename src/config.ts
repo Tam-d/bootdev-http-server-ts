@@ -23,7 +23,8 @@ export const chirpyConfig = {
     fileserverHits: 0,
     dbURL: envOrThrow("DB_URL"),
     platform: envOrThrow("PLATFORM"),
-    jwtSecret: envOrThrow("JWT_SECRET")
+    jwtSecret: envOrThrow("JWT_SECRET"),
+    polkaKey: envOrThrow("POLKA_KEY")
   },
   dbConfig: {
     dbUrl: envOrThrow("DB_URL"),

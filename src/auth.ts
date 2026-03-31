@@ -79,3 +79,13 @@ export function getBearerToken(req: Request): string {
 
     return authHeader.split(" ")[1];
 }
+
+export function getAPIKey(req: Request): string {
+    const authHeader = req.headers.authorization;
+
+    if(authHeader === "" || authHeader === null || authHeader === undefined) {
+        throw new UnauthorizedError("No token found");
+    }
+
+    return authHeader.split(" ")[1];
+}

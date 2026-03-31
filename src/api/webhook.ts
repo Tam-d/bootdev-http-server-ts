@@ -1,7 +1,9 @@
 import { Request, Response, NextFunction } from "express";
 import { upgradeUserToRed } from "../db/queries/users.js";
-import { NotFoundError } from "../error.js";
+import { NotFoundError, UnauthorizedError } from "../error.js";
 import { respondWithJSON } from "../respond.js";
+import { getAPIKey } from "../auth.js";
+import { chirpyConfig } from "../config.js";
 
 export async function handlerUpgradeToRed(
     req: Request, 
@@ -17,6 +19,13 @@ export async function handlerUpgradeToRed(
     }
     
     try {
+
+        const apiKey = getAPIKey(req);
+
+        if(apiKey != chirpyConfig.apiConfig.polkaKey) {
+            throw new UnauthorizedError("Authentication to api failed.");
+        }
+
         const payload = req.body;
         
         if(payload.event !== "user.upgraded") {

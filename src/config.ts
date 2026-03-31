@@ -7,6 +7,7 @@ type APIConfig = {
   dbURL: string,
   platform: string,
   jwtSecret: string
+  polkaKey: string
 };
 
 type DBConfig = {

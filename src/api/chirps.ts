@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { chirpyConfig } from "../config.js";
 import { BadRequestError, ForbiddenError, InternalServerError, NotFoundError, UnauthorizedError } from "../error.js";
 import { NewChirp } from "../db/schema.js";
-import { createChirp, deleteChirp, getChirp, getChirps } from "../db/queries/chirps.js";
+import { createChirp, deleteChirp, getChirp, getChirps, getChirpsByAuthorId } from "../db/queries/chirps.js";
 import { getBearerToken, validateJWT } from "../auth.js";
 import { respondWithJSON } from "../respond.js";
 
@@ -55,7 +55,18 @@ export async function handlerGetChirp(req: Request, res: Response, next: NextFun
 
 export async function handlerGetChirps(req: Request, res: Response, next: NextFunction) : Promise<void>{
     try {
-        const chirps: NewChirp[] = await getChirps();
+        let authorId = req.query.authorId;
+
+        console.log("AuthorId: ", authorId);
+
+        let chirps: NewChirp[] = [];
+
+        if(!authorId || authorId === "") {
+            chirps = await getChirps();
+        }
+        else {
+            chirps = await getChirpsByAuthorId(authorId as string);
+        }
 
         if(chirps === undefined || chirps.length === 0) {
             throw new InternalServerError("Internal error while retrieving chirps.");

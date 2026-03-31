@@ -34,6 +34,7 @@ export async function handlerCreateUser(req: Request, res: Response, next: NextF
         respondWithJSON(res,201, {
             id: newUser.id,
             email: newUser.email,
+            isChirpyRed: newUser.isChirpyRed,
             createdAt: newUser.createdAt,
             updatedAt: newUser.updatedAt,
         } satisfies CreatedUser);

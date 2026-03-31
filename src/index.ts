@@ -18,6 +18,7 @@ import { handlerCreateChirp, handlerDeleteChirp, handlerGetChirp, handlerGetChir
 import { handlerResetRequestCount } from "./api/reset.js";
 import { handlerUpdateUserPW, handlerUserLogin } from "./api/auth.js";
 import { handlerRefresh, handlerRevoke } from "./api/refresh.js";
+import { handlerUpgradeToRed } from "./api/webhook.js";
 
 const migrationClient = postgres(chirpyConfig.dbConfig.dbUrl, { max: 1 });
 await migrate(drizzle(migrationClient), chirpyConfig.dbConfig.migrationConfig);
@@ -39,6 +40,7 @@ app.post("/api/refresh", handlerRefresh);
 app.post("/api/revoke", handlerRevoke);
 app.post("/api/users", handlerCreateUser);
 app.put("/api/users", handlerUpdateUserPW);
+app.post("/api/polka/webhooks", handlerUpgradeToRed);
 app.get("/admin/metrics", handlerRequestCount);
 app.post("/admin/reset", handlerResetRequestCount);
 

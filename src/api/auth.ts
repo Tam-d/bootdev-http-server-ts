@@ -60,6 +60,7 @@ export async function handlerUserLogin(
                 createdAt: authenticatedUser.createdAt,
                 updatedAt: authenticatedUser.updatedAt,
                 email: authenticatedUser.email,
+                isChirpyRed: authenticatedUser.isChirpyRed,
                 token: accessToken,
                 refreshToken: refreshToken.token
             } satisfies LoginResponse
@@ -109,6 +110,7 @@ export async function handlerUpdateUserPW(
                 createdAt: updatedUser.createdAt,
                 updatedAt: updatedUser.updatedAt,
                 email: updatedUser.email,
+                isChirpyRed: updatedUser.isChirpyRed
             } satisfies UpdatedUser);
 
     }

@@ -5,6 +5,7 @@ import { NewChirp } from "../db/schema.js";
 import { createChirp, deleteChirp, getChirp, getChirps, getChirpsByAuthorId } from "../db/queries/chirps.js";
 import { getBearerToken, validateJWT } from "../auth.js";
 import { respondWithJSON } from "../respond.js";
+import { a, b } from "vitest/dist/chunks/suite.d.udJtyAgw.js";
 
 export async function handlerCreateChirp(req: Request, res: Response, next: NextFunction) : Promise<void> {
     try {
@@ -56,6 +57,7 @@ export async function handlerGetChirp(req: Request, res: Response, next: NextFun
 export async function handlerGetChirps(req: Request, res: Response, next: NextFunction) : Promise<void>{
     try {
         let authorId = req.query.authorId;
+        let sortBy = req.query.sort;
 
         console.log("AuthorId: ", authorId);
 
@@ -70,6 +72,37 @@ export async function handlerGetChirps(req: Request, res: Response, next: NextFu
 
         if(chirps === undefined || chirps.length === 0) {
             throw new InternalServerError("Internal error while retrieving chirps.");
+        }
+
+        if(sortBy === 'asc') {
+
+            
+            chirps = chirps.sort((a,b) => {
+                if(a.createdAt === undefined || b.createdAt === undefined) {
+                    throw new InternalServerError("Unable to sort");
+                }
+                if(a.createdAt < b.createdAt) {
+                    return -1
+                }
+                if(a.createdAt > b.createdAt) {
+                    return 1;
+                }
+                return 0
+            });
+        }
+        else if (sortBy === 'desc') {
+            chirps = chirps.sort((a,b) => {
+                if(a.createdAt === undefined || b.createdAt === undefined) {
+                    throw new InternalServerError("Unable to sort");
+                }
+                if(a.createdAt < b.createdAt) {
+                    return 1
+                }
+                if(a.createdAt > b.createdAt) {
+                    return -1;
+                }
+                return 0
+            });
         }
 
         respondWithJSON(res, 200, chirps);
